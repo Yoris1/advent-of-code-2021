@@ -18,7 +18,7 @@ int main() {
 	for(int i = 0; i < entry_count; i++) {
 		entries[i] = 0;
 	}
-	
+
 	// read entries into said array
 	rewind(input);
 	int current_line = 0;
@@ -30,7 +30,7 @@ int main() {
 		entries[current_line] *= 10;
 		entries[current_line] += in-0x30;
 	}
-	
+
 	// count the amount of times the depth increases over the sum of SUM(set to 1 for part 1 and 3 for part 2) entries
 	int depth_increase = 0;
 	for(int i =1; i < entry_count; i++) {
