@@ -8,15 +8,15 @@
 int get_most_common_bit(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, int digit, bool ignore[BUFF_COUNT], bool oxygen) {
 	int zeroes = 0;
 	int ones = 0;
+	
 	for(int i = 0; i < entry_count; i++) {
-		if(ignore[i] == true) {
+		if(ignore[i] == true)
 			continue;
-		}
-		if(buffer[i][digit] == '1')
-			ones ++;
-		else if(buffer[i][digit] == '0')
-			zeroes++;
+
+		ones += buffer[i][digit] == '1'?1:0;
+		zeroes += buffer[i][digit] == '1'?0:1;
 	}
+
 	if(oxygen) {
 		if(ones == zeroes) return 1;
 		return ones>zeroes?1:0;
@@ -55,8 +55,6 @@ int get_rating(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, int digit_
 		if(kept == 1) {
 			for(int j = 0; j < entry_count; j++) {
 				if(!ignore[j]) {
-
-					//printf("Result: %s", buffer[j]);
 					return binary_string_to_int(buffer[j], digit_length);
 				}
 			}
@@ -67,17 +65,15 @@ int get_rating(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, int digit_
 
 int main() {
 	FILE *input = fopen("input.inputfile", "r");
-
-	char buffer[BUFF_COUNT][BUFF_LENGTH];
+	char file_buffer[BUFF_COUNT][BUFF_LENGTH];
 	int i = 0;
-	buffer[0][1] = 'T';
-	while (true)
-		if(fgets(buffer[i++], 24, input) == NULL) break; // reserving the first bit for ability to discard things
+	while (fgets(file_buffer[i++], 24, input)) continue;
 	fclose(input);
 
-	int digit_length = strlen(buffer[0])-1;
+	int digit_length = strlen(file_buffer[0])-1;
 
-	int o2=get_rating(buffer, i, digit_length, true);
-	int co2 = get_rating(buffer, i, digit_length, false);
+	int o2  = get_rating(file_buffer, i, digit_length, true);
+	int co2 = get_rating(file_buffer, i, digit_length, false);
+
 	printf("CO2: %d, O2: %d, life support: %d\n", co2, o2, co2*o2);
 }
