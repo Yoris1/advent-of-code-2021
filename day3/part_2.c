@@ -5,10 +5,10 @@
 #define BUFF_COUNT 1001
 #define BUFF_LENGTH 24
 
-int get_most_common_bit(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, int digit, bool ignore[BUFF_COUNT]) {
+int get_most_common_bit(const char buffer[BUFF_COUNT][BUFF_LENGTH], const bool* eliminated_entries, int entry_count, int digit) {
 	int zeros = 0, ones = 0;
 	for(int i = 0; i < entry_count; i++) {
-		if(ignore[i]) continue;
+		if(eliminated_entries[i]) continue;
 		ones += buffer[i][digit] == '1'?1:0;
 		zeros += buffer[i][digit] == '0'?1:0;
 	}
@@ -16,43 +16,29 @@ int get_most_common_bit(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, i
 	return ones>zeros?0:1;
 }
 
-int binary_string_to_int(char str[BUFF_LENGTH], int digits) {
-	return (int)strtol(str, &str+strlen(str),2);
-}
-
 int get_rating(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, bool oxygen) {
 	bool ignore[BUFF_COUNT] = {false};
-	int digit_length = strlen(buffer[0])-1;
+	int line_length = strlen(buffer[0])-1;
 
-	for(int i = 0; i<digit_length; i++) {
-		int common = get_most_common_bit(buffer, entry_count, i, ignore);
+	for(int digit = 0; digit<line_length; digit++) {
+		int remaining_entries = 0; // entries that have not been eliminated
+		int common = get_most_common_bit(buffer, ignore, entry_count, digit);
+		if(oxygen) common = !common; // invert the most common bit if calculating oxygen
 		
-		if(oxygen) 
-			common = !common;
-		
-		int kept = 0;
+		// eliminate entries that don't match the bit criteria
+		for(int j = 0; j < entry_count; j++)
+			if(buffer[j][digit] == common+0x30 && !ignore[j]) remaining_entries++;
+			else ignore[j] = true;
 
-		for(int j = 0; j < entry_count; j++) {
-			if(buffer[j][i] == common+0x30 && !ignore[j]) {
-				//printf("Digit: %d(%d) Keeping: %s",i, common,  buffer[j]);
-				kept++;
-			} 
-			else {
-				ignore[j] = true;
+		// if only one entry left return it as int
+		for(int j = 0; j < entry_count && remaining_entries == 1; j++) {
+			if(!ignore[j])  {
+				char* result = buffer[j];
+				return (int) strtol(result, &result+strlen(result), 2); 
 			}
 		}
-
-		if(kept == 1) {
-			for(int j = 0; j < entry_count; j++) {
-				if(!ignore[j]) {
-					return binary_string_to_int(buffer[j], digit_length);
-				}
-			}
-		}
-
 	}
-
-
+	// shouldn't be here
 	return 0;
 }
 
