@@ -6,24 +6,23 @@
 #define BUFF_LENGTH 24
 
 int get_most_common_bit(char buffer[BUFF_COUNT][BUFF_LENGTH], int entry_count, int digit, bool ignore[BUFF_COUNT], bool oxygen) {
-	int zeroes = 0;
-	int ones = 0;
+	int zeros = 0, ones = 0;
 	
 	for(int i = 0; i < entry_count; i++) {
 		if(ignore[i] == true)
 			continue;
 
 		ones += buffer[i][digit] == '1'?1:0;
-		zeroes += buffer[i][digit] == '1'?0:1;
+		zeros += buffer[i][digit] == '1'?0:1;
 	}
 
 	if(oxygen) {
-		if(ones == zeroes) return 1;
-		return ones>zeroes?1:0;
+		if(ones == zeros) return 1;
+		return ones>zeros?1:0;
 	}
 	else {
-		if(ones == zeroes) return 0;
-		return ones>zeroes?0:1;
+		if(ones == zeros) return 0;
+		return ones>zeros?0:1;
 	}
 }
 int binary_string_to_int(char str[BUFF_LENGTH], int digits) {
