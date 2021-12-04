@@ -25,18 +25,26 @@ void mark_boards(char boards[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], in
 		}
 	}
 }
+
+bool check_board_victory(bool markers[BINGO_DIMENSIONS][BINGO_DIMENSIONS], int board_count) {
+	for(int i = 0; i < BINGO_DIMENSIONS; i++) {
+		bool win = true;
+		bool vertical = true;
+		for(int x = 0; x<BINGO_DIMENSIONS; x++) {
+			win &= markers[i][x];
+			vertical &= markers[x][i];
+		}
+		if(win || vertical) {
+			return true;
+		}
+	}
+	return false;
+}
+
 int get_winning_board(bool markers[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], int board_count) {
 	for(int t = 0; t < board_count; t++) {
-		for(int i = 0; i < BINGO_DIMENSIONS; i++) {
-			bool win = true;
-			bool vertical = true;
-			for(int x = 0; x<BINGO_DIMENSIONS; x++) {
-				win &= markers[t][i][x];
-				vertical &= markers[t][x][i];
-			}
-			if(win || vertical) {
-				return t;
-			}
+		if(check_board_victory(markers[t], board_count)) {
+			return t;
 		}
 	}
 	return -1;
@@ -53,17 +61,6 @@ int get_board_unmarked_sum(char board[BINGO_DIMENSIONS][BINGO_DIMENSIONS], bool 
 		}
 		return sum;
 }
-
-void print_array(bool array[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], int board_count) {
-	printf("printing array: \n");
-	for(int t = 0; t < board_count; t++) {
-		for(int i = 0; i < BINGO_DIMENSIONS; i++) {
-			printf("%i,%i,%i,%i,%i \n", array[t][i][0], array[t][i][1], array[t][i][2], array[t][i][3], array[t][i][4]);
-		}
-		printf("\n");
-	}
-	printf("Done!");
-} 
 
 int main() {
 	FILE *input = fopen("input.inputfile", "r");
