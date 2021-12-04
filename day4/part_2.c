@@ -114,26 +114,24 @@ int main() {
 	int ignored_boards_count = 0;
 	bool markers[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS] = {0};
 
-	printf("There will be %i draws", winning_number_count);
+	//printf("There will be %i draws", winning_number_count);
 
+	int last_result = -1;
 	for(int j = 0; j<winning_number_count; j++) {
 
-		printf("drawing %i:\n", winning_numbers[j]);
+		//printf("drawing %i:\n", winning_numbers[j]);
 		mark_boards(boards, board_count, markers, winning_numbers[j]);
 
-
-		int winning = -1;
-		winning = get_winning_board(markers, board_count, ignored_boards, ignored_boards_count);
-
-		while(winning != -1) {
+		int winning;
+		while((winning = get_winning_board(markers, board_count, ignored_boards, ignored_boards_count)) != -1) {
 			int result = get_board_unmarked_sum(boards[winning], markers[winning]);
 			ignored_boards[ignored_boards_count++] = winning;
 
-			printf("Current winner(%i): %i; %i; result: %i\n",winning, winning_numbers[j], result, winning_numbers[j]* result);
-			printf("ignored boards: %i", ignored_boards_count);
-			winning = get_winning_board(markers, board_count, ignored_boards, ignored_boards_count);
+			last_result = winning_numbers[j]*result;
+			//printf("Current winner(%i): %i; %i; result: %i\n",winning, winning_numbers[j], result, winning_numbers[j]* result);
+			//printf("ignored boards: %i", ignored_boards_count);
 		}
-
 	}
+	printf("AOC result: %i\n", last_result);
 
 }
