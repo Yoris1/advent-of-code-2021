@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define MAX_BOARDS 25
+#define MAX_BOARDS 200
 #define BINGO_DIMENSIONS 5
 
 void parse_bingo_line(char line[BINGO_DIMENSIONS], char* input) {
@@ -26,32 +26,39 @@ void mark_boards(char boards[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], in
 	}
 }
 int get_winning_board(bool markers[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], int board_count) {
-	for(int j = 0; j < board_count; j++) {
-		int horizontal = 0;
-		int vertical = 0;
-		for(int k = 0; k<5; k++) {
-			for(int t = 0; t < 5; t++) {
-				if(markers[j][k][t] == true) {
-					vertical += 1;
-				}
-				if(markers[j][t][k] == true) {
-					horizontal+=1;
-				}
+	for(int t = 0; t < board_count; t++) {
+		for(int i = 0; i < BINGO_DIMENSIONS; i++) {
+			bool win = true;
+			bool vertical = true;
+			for(int x = 0; x<BINGO_DIMENSIONS; x++) {
+				win &= markers[t][i][x];
+				vertical &= markers[t][x][i];
 			}
-		}
-		if(horizontal == 4|| vertical == 4) {
-			return j;
+			if(win || vertical) {
+				return t;
+			}
 		}
 	}
 	return -1;
 }
 
+int get_board_unmarked_sum(char board[BINGO_DIMENSIONS][BINGO_DIMENSIONS], bool markers[BINGO_DIMENSIONS][BINGO_DIMENSIONS]) {
+		int sum = 0;
+		for(int x = 0; x<BINGO_DIMENSIONS; x++) {
+			for(int y = 0; y<BINGO_DIMENSIONS; y++) {
+				if(markers[x][y])
+					continue;
+				sum += board[x][y];
+			}
+		}
+		return sum;
+}
+
 void print_array(bool array[MAX_BOARDS][BINGO_DIMENSIONS][BINGO_DIMENSIONS], int board_count) {
 	printf("printing array: \n");
 	for(int t = 0; t < board_count; t++) {
-
 		for(int i = 0; i < BINGO_DIMENSIONS; i++) {
-			printf("P: %i,%i,%i,%i,%i \n", array[t][i][0], array[t][i][1], array[t][i][2], array[t][i][3], array[t][i][4]);
+			printf("%i,%i,%i,%i,%i \n", array[t][i][0], array[t][i][1], array[t][i][2], array[t][i][3], array[t][i][4]);
 		}
 		printf("\n");
 	}
@@ -103,9 +110,12 @@ int main() {
 		printf("drawing %i:\n", winning_numbers[j]);
 		mark_boards(boards, current_board+1, markers, winning_numbers[j]);
 		int winning = get_winning_board(markers, current_board+1);
-		
-		print_array(markers, current_board+1);
-		printf("Current winner: %i\n", winning);
+		if(winning != -1) {
+			int result = get_board_unmarked_sum(boards[winning], markers[winning]);
+			printf("Current winner: %i; %i; result: %i\n", winning_numbers[j], result, winning_numbers[j]* result);
+			
+			return 0;
+		}
 	}
 	
 
