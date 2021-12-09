@@ -120,12 +120,15 @@ int get_number_from_line(char line[LINE_LENGTH]) {
 	printf("display output was: %s\n", output);
 	char output_tokens[10][8]; // there are only 4, but i wanna use my read_tokens method
 	read_tokens(output_tokens, output);
+	int output_reading = 0;
 	for(int i = 0; i < 4; i++) {
-		printf("Token %i is %s val: %i; | ", i+1, output_tokens[i], get_token_value(sorted_tokens, output_tokens[i]));
-
+		int token_value = get_token_value(sorted_tokens, output_tokens[i]);
+		output_reading *= 10;
+		output_reading += token_value;
+		printf("Token %i is %s val: %i; | ", i+1, output_tokens[i], token_value);
 	}
 	printf("\n");
-
+	return output_reading;
 }
 
 int main() {
