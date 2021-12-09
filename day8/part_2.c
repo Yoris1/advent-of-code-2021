@@ -24,7 +24,7 @@ int read_tokens(char tokens[10][8], char line[LINE_LENGTH]) {
 	char* token = strtok(line, " ");
 	int i = 0;
 	while(token != NULL) {
-		memcpy(tokens[i++], token, strlen(token));
+		memcpy(tokens[i++], token, strlen(token)+1);
 		token = strtok(NULL, " ");
 	}
 }
@@ -47,7 +47,20 @@ bool already_sorted(char value[8], char sorted_tokens[10][8]) {
 	}
 	return false;	
 }
+int get_token_value(char sorted_tokens[10][8], char token[8]) {
+	for(int i = 0; i < 10; i++) {
+		if(strlen(sorted_tokens[i]) == strlen(token)) {
+			if(strstr_unordered(sorted_tokens[i], token))
+				return i;
+		}
+	}
+	return -1;
+}
 int get_number_from_line(char line[LINE_LENGTH]) {
+	char* display_output = strchr(line, '|')+1;
+	char* output = malloc((strlen(display_output)+1)*sizeof(char));
+	memcpy(output, display_output, strlen(display_output)+1);
+
 	char tokens[10][8] = {{0}};
 	char sorted_tokens[10][8] = {{0}};
 	read_tokens(tokens, line);
@@ -91,9 +104,9 @@ int get_number_from_line(char line[LINE_LENGTH]) {
 		int token_length = strlen(tokens[i]);
 		if(!strstr_unordered(tokens[i], sorted_tokens[1])) {
 			if(strstr_unordered(sorted_tokens[9], tokens[i]))
-				memcpy(sorted_tokens[2], tokens[i], token_length+1);
-			else
 				memcpy(sorted_tokens[5], tokens[i], token_length+1);
+			else
+				memcpy(sorted_tokens[2], tokens[i], token_length+1);
 		}
 	}
 	
@@ -103,6 +116,16 @@ int get_number_from_line(char line[LINE_LENGTH]) {
 		printf("%s is %i(len: %i) | ", sorted_tokens[i], i, token_len);
 	}
 	printf("\n");
+
+	printf("display output was: %s\n", output);
+	char output_tokens[10][8]; // there are only 4, but i wanna use my read_tokens method
+	read_tokens(output_tokens, output);
+	for(int i = 0; i < 4; i++) {
+		printf("Token %i is %s val: %i; | ", i+1, output_tokens[i], get_token_value(sorted_tokens, output_tokens[i]));
+
+	}
+	printf("\n");
+
 }
 
 int main() {
