@@ -34,69 +34,73 @@ void replace_tokens(int a, int b, char tokens[10][8]) {
 	memcpy(tokens[a], tokens[b], strlen(tokens[b])+1);
 	memcpy(tokens[b], extra_space, strlen(extra_space)+1);
 }
-
 bool strstr_unordered(char* str, char* substr) {
 	for(int i =0; i < strlen(substr); i++)
 		if(strchr(str, substr[i]) == NULL)
 			return false;
 	return true;
 }
-void move_three_nine(char tokens[10][8], bool three) {
+bool already_sorted(char value[8], char sorted_tokens[10][8]) {
 	for(int i = 0; i < 10; i++) {
-		int token_len = strlen(tokens[i]);
-		if(strstr_unordered(tokens[i], tokens[0])) {
-			if(three && token_len == 5)
-				replace_tokens(3, i, tokens);
-			else if(!three && token_len == 6)
-				replace_tokens(9, i, tokens);
-		}
+		if(strcmp(sorted_tokens[i], value) == 0)
+			return true;
 	}
-}
-void move_six(char tokens[10][8]) {
-	for(int i = 0; i < 10; i++) {
-		int token_len = strlen(tokens[i]);
-		if(!strstr_unordered(tokens[i], tokens[0]) && token_len == 6	) {
-			replace_tokens(i, 6, tokens);
-		}
-	}
-}
-void find_and_replace(char tokens[10][8], int length, int replace_with) {
-	for(int i = 0; i < 10; i++) {
-		if(strlen(tokens[i]) == length)
-			replace_tokens(replace_with, i, tokens);
-	}
-}
-void move_2_5(char tokens[10][8], bool two) {
-	for(int i = 0; i< 10; i++) {
-		if(!strstr_unordered(tokens[9], tokens[i])) { 
-			if(two)
-				replace_tokens(i, 2, tokens);
-		} else if(two) {
-			replace_tokens(i, 5, tokens);
-		}
-	}
+	return false;	
 }
 int get_number_from_line(char line[LINE_LENGTH]) {
 	char tokens[10][8] = {{0}};
+	char sorted_tokens[10][8] = {{0}};
 	read_tokens(tokens, line);
 
-	find_and_replace(tokens, 2, 1);
-	find_and_replace(tokens, 4, 4);
-	find_and_replace(tokens, 3, 7);
-	find_and_replace(tokens, 7, 8);
+	// pass 1: sort the digits with a unique number of segments 
+	for(int i = 0; i < 10; i++) {
+		int token_length = strlen(tokens[i]);
+		if(token_length == 2)
+			memcpy(sorted_tokens[1], tokens[i], token_length+1);
+		if(token_length == 3)
+			memcpy(sorted_tokens[7], tokens[i], token_length+1);
+		if(token_length == 4)
+			memcpy(sorted_tokens[4], tokens[i], token_length+1);
+		if(token_length == 7)
+			memcpy(sorted_tokens[8], tokens[i], token_length+1);
+	}
 
-	move_three_nine(tokens, false);
-	move_three_nine(tokens, true);
-	move_six(tokens);
-	move_2_5(tokens, false);
-	move_2_5(tokens, true);
+	for(int i = 0; i < 10; i++) {
+		// pass 2: if a digit contains the same segments as 1 does and it's made of 5 segments it's 3; if it's made of 6 it's a 9 or 0
+		// to differentiate between a 9 and a 0: if it has all the segments that a 4 does, it's a 9, otherwise it's a 0! 
+		// if the digit does not contain the same segments as 1 and it's made of 6 letters it's a 6
+		int token_length = strlen(tokens[i]);
 
+		if(strstr_unordered(tokens[i], sorted_tokens[1])) {
+			if(token_length == 5)
+				memcpy(sorted_tokens[3], tokens[i], token_length+1);
+			else if(token_length == 6) {
+				if(strstr_unordered(tokens[i], sorted_tokens[4]))
+					memcpy(sorted_tokens[9], tokens[i], token_length+1);
+				else
+					memcpy(sorted_tokens[0], tokens[i], token_length+1);
+			}
+		} else if(strlen(tokens[i]) == 6) {
+			memcpy(sorted_tokens[6], tokens[i], token_length+1);
+		}
+	}
 
-
+	for(int i = 0; i < 10; i++) {
+		if(already_sorted(tokens[i], sorted_tokens)) continue;
+		// pass 3: if a digit does not contain the same segments as 1 and it contains segments that a 9 doesn't have it's a 2, otherwise: 5
+		int token_length = strlen(tokens[i]);
+		if(!strstr_unordered(tokens[i], sorted_tokens[1])) {
+			if(strstr_unordered(sorted_tokens[9], tokens[i]))
+				memcpy(sorted_tokens[2], tokens[i], token_length+1);
+			else
+				memcpy(sorted_tokens[5], tokens[i], token_length+1);
+		}
+	}
 	
 	for(int i = 0; i < 10; i++) {
-		int token_len = strlen(tokens[i]);
-		printf("digit %i is %s (len: %i); ", i,  tokens[i], token_len);
+		int token_len = strlen(sorted_tokens[i]);
+		if(token_len == 0) continue;
+		printf("%s is %i(len: %i) | ", sorted_tokens[i], i, token_len);
 	}
 	printf("\n");
 }
