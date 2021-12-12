@@ -43,7 +43,7 @@ bool is_point_lowest_risk(char map[MAP_HEIGHT][MAP_WIDTH], vec2i map_bounds, vec
 
 bool vec2i_in_dynamic_array(d_array *arr, vec2i p) {
 	vec2i* raw = arr->raw;
-	for(int i = 0; i < arr->count; i++)
+	for(size_t i = 0; i < arr->count; i++)
 		if(raw[i].x == p.x && raw[i].y == p.y) return true;
 	return false;
 }
