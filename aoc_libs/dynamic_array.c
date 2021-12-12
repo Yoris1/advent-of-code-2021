@@ -1,15 +1,16 @@
 #include "dynamic_array.h"
 #include <stdlib.h>
 
-d_array create_dynamic_array(size_t initial_length, size_t element_size) {
-	d_array arr;
+d_array *create_dynamic_array(size_t initial_length, size_t element_size) {
+	d_array* arr = malloc(sizeof(d_array));
+	
 	initial_length = initial_length<1?1:initial_length;
 	
-	arr.raw = malloc(initial_length*element_size);
-	arr.count = 0;
+	arr->raw = malloc(initial_length*element_size);
+	arr->count = 0;
 
-	arr._length = initial_length;
-	arr._element_size = element_size;
+	arr->_length = initial_length;
+	arr->_element_size = element_size;
 	return arr;
 }
 
@@ -29,6 +30,5 @@ void add_to_dynamic_array(d_array* arr, const void* item) {
 
 void delete_dynamic_array(d_array* arr) {
 	free(arr->raw);
-	arr->count = 0;
-	arr->_length = 0;
+	free(arr);
 }
