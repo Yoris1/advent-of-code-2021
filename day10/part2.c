@@ -31,7 +31,7 @@ uint64_t get_line_points(char line[BUFFER_SIZE]) {
 		}
 		else add_to_dynamic_array(arr, &closing_character);
 	}
-	((char*)arr->raw)[arr->count] = 0; // make string of completion characters null termianted!
+	((char*)arr->raw)[arr->count] = 0; // make string of completion characters null termianted
 
 	printf(ANSI_ESCAPE_ERROR "%s" ANSI_ESCAPE_RESET " - Complete by adding " ANSI_ESCAPE_ERROR, line);
 
@@ -42,15 +42,15 @@ uint64_t get_line_points(char line[BUFFER_SIZE]) {
 		points *= 5;
 		points += strchr(closing_characters, c)-closing_characters+1;
 	}
-	printf(ANSI_ESCAPE_RESET" for "  ANSI_ESCAPE_ERROR"%i"ANSI_ESCAPE_RESET " total points.\n", points);
+	printf(ANSI_ESCAPE_RESET" for "  ANSI_ESCAPE_ERROR"%ld" ANSI_ESCAPE_RESET " total points.\n", points);
 	delete_dynamic_array(arr);
 	return points;
 }
 
-uint64_t compare_ints(const void* a, const void* b) {
+int compare_ints(const void* a, const void* b) {
 	const uint64_t *_a = a;
 	const uint64_t *_b = b;
-	return *_b-*_a;
+	return (int) (*_b>*_a);
 }
 
 int main() {
